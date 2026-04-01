@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TP SNT - Cookies et Traceurs - M. Borel</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #eef2f7; color: #1a1a2e; font-size: 15px; }
+
+.topbar {
+  background: #0d4a75;
+  color: white;
+  padding: 10px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+.topbar .titre { font-weight: bold; color: #7ec8f7; font-size: 14px; }
+
+.progressbar { height: 4px; background: #d6e9f8; }
+.progressfill { height: 4px; background: #e07b00; width: 0%; transition: width 0.3s; }
+
+.hero {
+  background: linear-gradient(135deg, #0d4a75, #1a6ea8);
+  color: white;
+  text-align: center;
+  padding: 40px 20px;
+}
+.hero .icone { font-size: 52px; margin-bottom: 12px; }
+.hero h1 { font-size: 26px; line-height: 1.3; margin-bottom: 6px; }
+.hero h1 span { color: #ffd54f; }
+.hero .sub { font-size: 14px; opacity: 0.85; margin-top: 6px; }
+.badges { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+.badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 4px 12px; font-size: 12px; }
+
+.main { max-width: 820px; margin: 0 auto; padding: 28px 16px 60px; }
+
+.carte {
+  background: white;
+  border-radius: 10px;
+  padding: 18px 22px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  margin-bottom: 24px;
+  border-left: 4px solid #1a6ea8;
+}
+.carte h3 { color: #1a6ea8; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.champ label { display: block; font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; font-weight: bold; }
+.champ input { width: 100%; border: 1.5px solid #dee3ea; border-radius: 6px; padding: 7px 10px; font-size: 14px; font-family: Arial, sans-serif; }
+.champ input:focus { outline: none; border-color: #1a6ea8; }
+
+.contexte {
+  background: #d6e9f8;
+  border-left: 4px solid #1a6ea8;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 26px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #1a3a5c;
+}
+.contexte strong { color: #0d4a75; }
+
+.mission { background: white; border-radius: 12px; margin-bottom: 28px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+
+.mhead { padding: 14px 22px; display: flex; align-items: center; gap: 12px; }
+.mhead .num { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; color: white; flex-shrink: 0; }
+.mhead .mtitle { color: white; font-size: 16px; font-weight: bold; }
+.mhead .memoji { font-size: 20px; }
+
+.m1 .mhead { background: linear-gradient(90deg, #0d4a75, #1a6ea8); }
+.m2 .mhead { background: linear-gradient(90deg, #bf6000, #e07b00); }
+.m3 .mhead { background: linear-gradient(90deg, #1b5e20, #2e7d32); }
+
+.mbody { padding: 22px; }
+
+.encadre { border-radius: 8px; padding: 16px 18px; margin-bottom: 20px; }
+.encadre.bleu { background: #d6e9f8; border-left: 4px solid #1a6ea8; }
+.encadre.orange { background: #fff3e0; border-left: 4px solid #e07b00; }
+.encadre.vert { background: #e8f5e9; border-left: 4px solid #2e7d32; }
+.encadre h4 { font-size: 14px; font-weight: bold; margin-bottom: 10px; }
+.encadre.bleu h4 { color: #0d4a75; }
+.encadre.orange h4 { color: #7a4000; }
+.encadre.vert h4 { color: #1b5e20; }
+.encadre ul { padding-left: 18px; }
+.encadre ul li { font-size: 13.5px; margin-bottom: 6px; line-height: 1.5; }
+
+.etapes { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.etape { display: flex; gap: 12px; align-items: flex-start; background: #f5f7fa; border-radius: 8px; padding: 11px 14px; }
+.etape .en { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: white; flex-shrink: 0; margin-top: 1px; }
+.m1 .etape .en { background: #1a6ea8; }
+.m2 .etape .en { background: #e07b00; }
+.m3 .etape .en { background: #2e7d32; }
+.etape p { font-size: 14px; line-height: 1.55; }
+.etape code { background: #e8eef5; padding: 1px 5px; border-radius: 3px; font-family: monospace; font-size: 13px; color: #0d4a75; }
+.etape a { color: #1a6ea8; font-weight: bold; }
+
+.question { margin-bottom: 18px; }
+.qlabel { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+.qnum { border-radius: 5px; padding: 2px 8px; font-size: 12px; font-weight: 800; color: white; flex-shrink: 0; margin-top: 2px; }
+.m1 .qnum { background: #1a6ea8; }
+.m2 .qnum { background: #e07b00; }
+.m3 .qnum { background: #2e7d32; }
+.bilan .qnum { background: #0d4a75; }
+.qlabel p { font-size: 14.5px; line-height: 1.55; }
+
+textarea {
+  width: 100%;
+  border: 1.5px solid #dee3ea;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  resize: vertical;
+  color: #1a1a2e;
+  display: block;
+}
+textarea:focus { outline: none; border-color: #1a6ea8; }
+
+.g2 { display: grid; grid-template-columns: 1fr 1fr; border: 1.5px solid #dee3ea; border-radius: 8px; overflow: hidden; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; border: 1.5px solid #dee3ea; border-radius: 8px; overflow: hidden; }
+.gcol { display: flex; flex-direction: column; }
+.gcol + .gcol { border-left: 1.5px solid #dee3ea; }
+.gcol .gh { background: #f5f7fa; padding: 8px 12px; font-size: 13px; font-weight: bold; color: #444; text-align: center; border-bottom: 1.5px solid #dee3ea; }
+.gcol textarea { border: none; border-radius: 0; min-height: 65px; }
+.gcol textarea + textarea { border-top: 1.5px solid #dee3ea; }
+.gcol textarea:focus { background: #f0f7ff; outline: none; }
+
+.bilan-section {
+  background: white;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  border: 2px solid #1a6ea8;
+  margin-bottom: 22px;
+}
+.bilan-title { text-align: center; color: #1a6ea8; font-size: 18px; font-weight: 800; margin-bottom: 18px; }
+
+.bonus { background: #fffde7; border-radius: 10px; padding: 16px 20px; border-left: 4px solid #f9a825; margin-bottom: 28px; }
+.bonus h4 { color: #795600; font-size: 14px; margin-bottom: 8px; }
+.bonus p { font-size: 13.5px; color: #5a4000; line-height: 1.55; margin-bottom: 10px; }
+.bonus a { color: #795600; font-weight: bold; }
+
+/* ZONE ENVOI */
+.envoi-zone {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  border: 2px solid #2e7d32;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.envoi-zone h3 { color: #2e7d32; font-size: 16px; margin-bottom: 8px; }
+.envoi-zone p { font-size: 13.5px; color: #555; margin-bottom: 18px; line-height: 1.55; }
+
+.envoi-btn {
+  background: #2e7d32;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 13px 32px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.envoi-btn:hover { background: #1b5e20; }
+.envoi-btn:disabled { background: #aaa; cursor: not-allowed; }
+
+.envoi-status { margin-top: 14px; font-size: 14px; font-weight: bold; min-height: 22px; }
+.envoi-status.ok { color: #2e7d32; }
+.envoi-status.err { color: #c62828; }
+.envoi-status.loading { color: #1a6ea8; }
+
+.alerte-nom {
+  background: #fff3e0;
+  border: 1.5px solid #e07b00;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 13.5px;
+  color: #7a4000;
+  margin-bottom: 14px;
+  display: none;
+}
+
+footer { text-align: center; color: #999; font-size: 12px; padding: 20px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>SNT - Seconde - Lycee Jehan de Chelles</div>
+  <div class="titre">TP - Cookies et Traceurs</div>
+  <div>M. Borel</div>
+</div>
+<div class="progressbar"><div class="progressfill" id="prog"></div></div>
+
+<div class="hero">
+  <div class="icone">&#128269;</div>
+  <h1>Enquete numerique :<br><span>Qui vous espionne sur Internet ?</span></h1>
+  <p class="sub">Sciences Numeriques et Technologie &middot; Duree : 1 heure</p>
+  <div class="badges">
+    <span class="badge">Navigateur web</span>
+    <span class="badge">1 heure</span>
+    <span class="badge">Individuel</span>
+    <span class="badge">Enquete / Investigation</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- IDENTITE -->
+  <div class="carte">
+    <h3>Mon identite</h3>
+    <div class="row2">
+      <div class="champ"><label>Nom *</label><input type="text" id="nom" placeholder="Ton nom (obligatoire)"></div>
+      <div class="champ"><label>Prenom *</label><input type="text" id="prenom" placeholder="Ton prenom (obligatoire)"></div>
+      <div class="champ"><label>Classe</label><input type="text" id="classe" placeholder="Ex : 2nde B"></div>
+      <div class="champ"><label>Date</label><input type="date" id="date"></div>
+    </div>
+  </div>
+
+  <div class="contexte">
+    Chaque fois que tu visites un site web, des fichiers appeles <strong>cookies</strong> sont deposes sur ton ordinateur. Certains sont utiles (memoriser ta session, ton panier...), d'autres servent a <strong>te pister et collecter tes donnees personnelles</strong>. Dans ce TP, tu vas mener une veritable enquete pour observer, analyser et comprendre ce mecanisme.
+  </div>
+
+  <!-- MISSION 1 -->
+  <div class="mission m1">
+    <div class="mhead">
+      <div class="num">1</div>
+      <div class="memoji">&#128270;</div>
+      <div class="mtitle">Observer les cookies en direct</div>
+    </div>
+    <div class="mbody">
+
+      <div class="encadre bleu">
+        <h4>Comment acceder aux cookies dans ton navigateur ?</h4>
+        <ul>
+          <li>Appuie sur <strong>F12</strong> pour ouvrir les outils developpeur.</li>
+          <li>Clique sur l'onglet <strong>Application</strong> (Chrome) ou <strong>Stockage</strong> (Firefox).</li>
+          <li>Dans le menu de gauche, clique sur <strong>Cookies</strong> puis l'URL du site.</li>
+          <li>Tu vois la liste des cookies : nom, valeur, domaine, date d'expiration...</li>
+        </ul>
+      </div>
+
+      <div class="etapes">
+        <div class="etape"><div class="en">1</div><p>Ouvre ton navigateur et rends-toi sur <a href="https://www.lemonde.fr" target="_blank">www.lemonde.fr</a>.</p></div>
+        <div class="etape"><div class="en">2</div><p><strong>Ne clique PAS</strong> sur "Accepter les cookies". Ouvre d'abord <code>F12</code> &rarr; onglet <code>Application</code> &rarr; <code>Cookies</code>.</p></div>
+        <div class="etape"><div class="en">3</div><p>Note combien de cookies sont presents <strong>avant</strong> d'accepter. Explore les noms et valeurs.</p></div>
+        <div class="etape"><div class="en">4</div><p>Clique sur <strong>Accepter tous les cookies</strong>, puis observe la difference.</p></div>
+      </div>
+
+      <div class="question">
+        <div class="qlabel"><span class="qnum">Q1</span><p>Combien de cookies sont presents <strong>avant</strong> d'accepter ? Et <strong>apres</strong> ?</p></div>
+        <div class="g2">
+          <div class="gcol">
+            <div class="gh">Avant acceptation</div>
+            <textarea id="q1a" rows="3" placeholder="Nombre observe..."></textarea>
+          </div>
+          <div class="gcol">
+            <div class="gh">Apres acceptation</div>
+            <textarea id="q1b" rows="3" placeholder="Nombre observe..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="qlabel"><span class="qnum">Q2</span><p>Donne le nom de <strong>3 cookies</strong>, leur domaine emetteur, et devine a quoi chacun sert.</p></div>
+        <div class="g3">
+          <div class="gcol">
+            <div class="gh">Nom du cookie</div>
+            <textarea id="q2n1" rows="3" placeholder="cookie_1..."></textarea>
+            <textarea id="q2n2" rows="3" placeholder="cookie_2..."></textarea>
+            <textarea id="q2n3" rows="3" placeholder="cookie_3..."></textarea>
+          </div>
+          <div class="gcol">
+            <div class="gh">Domaine emetteur</div>
+            <textarea id="q2d1" rows="3"></textarea>
+            <textarea id="q2d2" rows="3"></textarea>
+            <textarea id="q2d3" rows="3"></textarea>
+          </div>
+          <div class="gcol">
+            <div class="gh">A quoi ca sert (hypothese)</div>
+            <textarea id="q2s1" rows="3"></textarea>
+            <textarea id="q2s2" rows="3"></textarea>
+            <textarea id="q2s3" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MISSION 2 -->
+  <div class="mission m2">
+    <div class="mhead">
+      <div class="num">2</div>
+      <div class="memoji">&#128193;</div>
+      <div class="mtitle">Classer et analyser les cookies</div>
+    </div>
+    <div class="mbody">
+
+      <div class="encadre orange">
+        <h4>Les 4 grandes categories de cookies</h4>
+        <ul>
+          <li><strong>Cookies techniques / fonctionnels :</strong> Indispensables au fonctionnement du site (garder ta session, memoriser ton panier). Ne collectent pas de donnees marketing.</li>
+          <li><strong>Cookies de mesure d'audience :</strong> Comptent les visiteurs, les pages consultees, le temps passe (ex : Google Analytics).</li>
+          <li><strong>Cookies publicitaires / de ciblage :</strong> Analysent tes habitudes pour t'envoyer des publicites personnalisees. Les plus intrusifs.</li>
+          <li><strong>Cookies de partage (reseaux sociaux) :</strong> Boutons "Partager sur Facebook", etc. Transmettent des donnees meme sans clic.</li>
+        </ul>
+      </div>
+
+      <div class="question">
+        <div class="qlabel"><span class="qnum">Q3</span><p>Reprends les 3 cookies de ta Q2 et classe-les dans la bonne categorie.</p></div>
+        <div class="g3">
+          <div class="gcol">
+            <div class="gh">Nom du cookie</div>
+            <textarea id="q3n1" rows="3" placeholder="cookie_1..."></textarea>
+            <textarea id="q3n2" rows="3" placeholder="cookie_2..."></textarea>
+            <textarea id="q3n3" rows="3" placeholder="cookie_3..."></textarea>
+          </div>
+          <div class="gcol">
+            <div class="gh">Type de cookie</div>
+            <textarea id="q3t1" rows="3" placeholder="Ex : publicitaire..."></textarea>
+            <textarea id="q3t2" rows="3"></textarea>
+            <textarea id="q3t3" rows="3"></textarea>
+          </div>
+          <div class="gcol">
+            <div class="gh">Justification</div>
+            <textarea id="q3j1" rows="3"></textarea>
+            <textarea id="q3j2" rows="3"></textarea>
+            <textarea id="q3j3" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="qlabel"><span class="qnum">Q4</span><p>Quel type de cookie est le plus problematique pour la vie privee ? Justifie en 2 lignes.</p></div>
+        <textarea id="q4" rows="3" placeholder="Ton explication..."></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MISSION 3 -->
+  <div class="mission m3">
+    <div class="mhead">
+      <div class="num">3</div>
+      <div class="memoji">&#128737;</div>
+      <div class="mtitle">Tester la navigation privee</div>
+    </div>
+    <div class="mbody">
+
+      <div class="etapes">
+        <div class="etape"><div class="en">1</div><p>Ouvre une fenetre de <strong>navigation privee</strong> : <code>Ctrl+Maj+N</code> (Chrome) ou <code>Ctrl+Maj+P</code> (Firefox).</p></div>
+        <div class="etape"><div class="en">2</div><p>Visite <a href="https://www.marmiton.org" target="_blank">www.marmiton.org</a> et ouvre <code>F12</code> &rarr; <code>Application</code> &rarr; <code>Cookies</code>.</p></div>
+        <div class="etape"><div class="en">3</div><p>Ferme la fenetre privee, rouvre une fenetre <strong>normale</strong> et visite le meme site. Compare.</p></div>
+      </div>
+
+      <div class="question">
+        <div class="qlabel"><span class="qnum">Q5</span><p>Compare le nombre de cookies en navigation privee vs navigation normale.</p></div>
+        <div class="g2">
+          <div class="gcol">
+            <div class="gh">Navigation normale</div>
+            <textarea id="q5n" rows="3" placeholder="Nombre et observations..."></textarea>
+          </div>
+          <div class="gcol">
+            <div class="gh">Navigation privee</div>
+            <textarea id="q5p" rows="3" placeholder="Nombre et observations..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="qlabel"><span class="qnum">Q6</span><p>La navigation privee te rend-elle <strong>completement invisible</strong> ? Explique les limites de cette protection.</p></div>
+        <textarea id="q6" rows="4" placeholder="Reflechis : qui peut encore te voir meme en navigation privee ?"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BILAN -->
+  <div class="bilan-section bilan">
+    <div class="bilan-title">Bilan de l'enquete</div>
+    <div class="question">
+      <div class="qlabel"><span class="qnum">Q7</span><p>En <strong>3 a 5 lignes</strong>, redige une synthese de ce que tu as appris sur les cookies et la vie privee en ligne. Tu peux mentionner le <strong>RGPD</strong> si tu en as entendu parler.</p></div>
+      <textarea id="q7" rows="6" placeholder="Redige ta synthese ici..."></textarea>
+    </div>
+  </div>
+
+  <!-- BONUS -->
+  <div class="bonus">
+    <h4>Pour aller plus loin (si tu as termine avant la fin)</h4>
+    <p>Rends-toi sur <a href="https://www.cnil.fr/fr/cookies-et-traceurs-que-dit-la-loi" target="_blank">www.cnil.fr &rarr; Cookies et traceurs</a> et note 2 droits que tu as en tant qu'utilisateur.</p>
+    <textarea id="bonus" rows="3" placeholder="Droits notes depuis la CNIL..."></textarea>
+  </div>
+
+  <!-- ZONE ENVOI -->
+  <div class="envoi-zone">
+    <h3>&#9989; Envoyer mes reponses au professeur</h3>
+    <p>Verifie que ton nom et prenom sont bien remplis, puis clique sur le bouton.<br>Tes reponses seront envoyees directement a M. Borel.</p>
+    <div class="alerte-nom" id="alerte-nom">
+      Merci de renseigner ton nom et ton prenom avant d'envoyer !
+    </div>
+    <button class="envoi-btn" id="btn-envoi" onclick="envoyerReponses()">
+      Envoyer mes reponses
+    </button>
+    <div class="envoi-status" id="envoi-status"></div>
+  </div>
+
+  <footer>M. Borel &middot; Lycee Jehan de Chelles &middot; SNT Seconde &middot; TP Cookies et Traceurs</footer>
+</div>
+
+<script>
+// =====================================================
+// REMPLACE "VOTRE_ID_FORMSPREE" par ton vrai ID
+// apres inscription sur formspree.io
+// Ex : "https://formspree.io/f/xpwzabcd"
+// =====================================================
+var FORMSPREE_URL = "https://formspree.io/f/mdapdwoq";
+
+var qprinc = ['q1a','q1b','q2n1','q3n1','q4','q5n','q6','q7'];
+
+function prog() {
+  var n = 0;
+  qprinc.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && el.value.trim().length > 3) n++;
+  });
+  document.getElementById('prog').style.width = Math.round(n / qprinc.length * 100) + '%';
+}
+
+function lire(id) {
+  var el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function envoyerReponses() {
+  var nom = lire('nom');
+  var prenom = lire('prenom');
+
+  // Verification nom/prenom
+  if (!nom || !prenom) {
+    document.getElementById('alerte-nom').style.display = 'block';
+    return;
+  }
+  document.getElementById('alerte-nom').style.display = 'none';
+
+  var btn = document.getElementById('btn-envoi');
+  var status = document.getElementById('envoi-status');
+
+  btn.disabled = true;
+  status.className = 'envoi-status loading';
+  status.textContent = 'Envoi en cours...';
+
+  // Construction des donnees
+  var data = {
+    Eleve: prenom + ' ' + nom,
+    Classe: lire('classe'),
+    Date: lire('date'),
+    // Mission 1
+    Q1_avant_acceptation: lire('q1a'),
+    Q1_apres_acceptation: lire('q1b'),
+    Q2_cookie1_nom: lire('q2n1'),
+    Q2_cookie1_domaine: lire('q2d1'),
+    Q2_cookie1_usage: lire('q2s1'),
+    Q2_cookie2_nom: lire('q2n2'),
+    Q2_cookie2_domaine: lire('q2d2'),
+    Q2_cookie2_usage: lire('q2s2'),
+    Q2_cookie3_nom: lire('q2n3'),
+    Q2_cookie3_domaine: lire('q2d3'),
+    Q2_cookie3_usage: lire('q2s3'),
+    // Mission 2
+    Q3_cookie1_type: lire('q3t1'),
+    Q3_cookie1_justif: lire('q3j1'),
+    Q3_cookie2_type: lire('q3t2'),
+    Q3_cookie2_justif: lire('q3j2'),
+    Q3_cookie3_type: lire('q3t3'),
+    Q3_cookie3_justif: lire('q3j3'),
+    Q4_cookie_problematique: lire('q4'),
+    // Mission 3
+    Q5_nav_normale: lire('q5n'),
+    Q5_nav_privee: lire('q5p'),
+    Q6_limites_nav_privee: lire('q6'),
+    // Bilan
+    Q7_synthese: lire('q7'),
+    Bonus_CNIL: lire('bonus')
+  };
+
+  fetch(FORMSPREE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(function(resp) {
+    if (resp.ok) {
+      status.className = 'envoi-status ok';
+      status.textContent = 'Reponses envoyees avec succes ! Merci ' + prenom + '.';
+      btn.textContent = 'Reponses envoyees';
+    } else {
+      throw new Error('Erreur serveur');
+    }
+  })
+  .catch(function() {
+    status.className = 'envoi-status err';
+    status.textContent = 'Erreur lors de l\'envoi. Verifie ta connexion et reessaie.';
+    btn.disabled = false;
+  });
+}
+
+qprinc.forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) el.addEventListener('input', prog);
+});
+</script>
+</body>
+</html>
